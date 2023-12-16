@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+/.vs/LeilaoCpp
+/.vs
+/x64/Debug
