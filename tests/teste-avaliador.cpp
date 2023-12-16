@@ -1,0 +1,73 @@
+#include "../tests/catch.hpp"
+#include "../src/Avaliador.hpp"
+
+Leilao emOrdemCrescente() {
+	Lance primeiroLance(Usuario("Vinicius Dias"), 1000);
+	Lance segundoLance(Usuario("Ana Maria"), 2000);
+	Leilao leilao("Fiat 147 0Km");
+	leilao.recebeLance(primeiroLance);
+	leilao.recebeLance(segundoLance);
+
+	return leilao;
+}
+
+Leilao emOrdemDecrescente() {
+	Lance primeiroLance(Usuario("Vinicius Dias"), 2000);
+	Lance segundoLance(Usuario("Ana Maria"), 1000);
+	Leilao leilao("Fiat 147 0Km");
+	leilao.recebeLance(primeiroLance);
+	leilao.recebeLance(segundoLance);
+
+	return leilao;
+}
+
+TEST_CASE("Avaliador") {
+	// Arrange - Given
+	Avaliador avaliador;
+
+	SECTION("Leiloes com ordem") {
+		Leilao leilao = GENERATE(emOrdemCrescente(), emOrdemDecrescente());
+		
+		SECTION("Deve recuperar maior lance de leilão") {
+			// Act - When
+			avaliador.avalia(leilao);
+
+			// Assert - Then
+			REQUIRE(2000 == avaliador.recuperaMaiorValor());
+		}
+
+		SECTION("Deve recuperar menor lance de leilão") {
+			// Act - When
+			avaliador.avalia(leilao);
+
+			// Assert - Then
+			REQUIRE(1000 == avaliador.recuperaMenorValor());
+		}
+	}
+
+	SECTION("Deve recuperar os 3 maiores lances") {
+		// Arrange - Given
+		Lance primeiroLance(Usuario("Vinicius Dias"), 1000);
+		Lance segundoLance(Usuario("Ana Maria"), 2000);
+		Lance terceiroLance(Usuario("Pedro"), 1500);
+		Lance quartoLance(Usuario("Fernanda"), 2500);
+		Leilao leilao("Fiat 147 0Km");
+		leilao.recebeLance(primeiroLance);
+		leilao.recebeLance(segundoLance);
+		leilao.recebeLance(terceiroLance);
+		leilao.recebeLance(quartoLance);
+
+		Avaliador leiloeiro;
+
+		// Act - When
+		leiloeiro.avalia(leilao);
+
+		// Assert - Then
+		std::vector<Lance> maiores3Lances = leiloeiro.recupera3MaioresLances();
+		REQUIRE(3 == maiores3Lances.size());
+		REQUIRE(2500 == maiores3Lances[0].recuperaValor());
+		REQUIRE(2000 == maiores3Lances[1].recuperaValor());
+		REQUIRE(1500 == maiores3Lances[2].recuperaValor());
+	}
+
+}
